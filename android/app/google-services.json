@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "7790557891",
+    "project_id": "janwar-x",
+    "storage_bucket": "janwar-x.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:7790557891:android:5312aa292dcbe10e578076",
+        "android_client_info": {
+          "package_name": "com.example.janwar_x"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0qECRb7H4BKjWkO1ucY7rZ7wLQzAuilg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
