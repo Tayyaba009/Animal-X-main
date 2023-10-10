@@ -1,11 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Import the services.dart package
 import 'package:get/get.dart';
 import 'package:janwar_x/views/splashscreen/splashscreen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,]); // Disable screen rotation
   runApp(const MyApp());
 }
 

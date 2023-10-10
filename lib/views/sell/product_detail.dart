@@ -27,7 +27,7 @@ class ProductDetailPage extends StatelessWidget {
     final videoUrl = productSnapshot['videoUrl'] ?? '';
 
     return Scaffold(
-      backgroundColor: Color(0xFFF6C08B), // Background color
+      backgroundColor: Color(0xFFFBEEDB),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Column(
@@ -61,18 +61,18 @@ class ProductDetailPage extends StatelessWidget {
                     // Display Name as a heading without a box
                     Text(
                       title,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white), // White color
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black), // White color
                     ),
                     // Display Price as a subheading to the right of Name
                     Row(
                       children: [
                         Text(
                           'Price: ',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white), // White color
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.brown), // White color
                         ),
                         Text(
                           price,
-                          style: TextStyle(fontSize: 16, color: Colors.white), // White color
+                          style: TextStyle(fontSize: 16, color: Colors.brown), // White color
                         ),
                       ],
                     ),
@@ -80,12 +80,12 @@ class ProductDetailPage extends StatelessWidget {
                     // Description
                     Text(
                       "Description",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white), // White color
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.brown), // White color
                     ),
                     SizedBox(height: 5),
                     Text(
                       description,
-                      style: TextStyle(fontSize: 14, color: Colors.white), // White color
+                      style: TextStyle(fontSize: 14, color: Colors.brown), // White color
                     ),
                     SizedBox(height: 20),
                     // Display Age, Weight, and Quantity in boxes with spacing
@@ -105,7 +105,7 @@ class ProductDetailPage extends StatelessWidget {
                         onPressed: () {
                           // Implement video playback here
                         },
-                        child: Text("Play Video", style: TextStyle(color: Colors.white),), // White color
+                        child: Text("Play Video", style: TextStyle(color: Colors.brown),), // White color
                       ),
                   ],
                 ),
@@ -123,13 +123,13 @@ class ProductDetailPage extends StatelessWidget {
       height: 40, // Adjust the height as needed
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white, width: 1),
+        border: Border.all(color: Colors.deepOrange, width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Center(
         child: Text(
           value,
-          style: TextStyle(fontSize: 12, color: Colors.white), // White color
+          style: TextStyle(fontSize: 12, color: Colors.brown), // White color
         ),
       ),
     );

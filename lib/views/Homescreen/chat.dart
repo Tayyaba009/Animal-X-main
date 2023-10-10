@@ -31,8 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final pickedImage = await imagePicker.getImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
-      setState(() {
-      });
+      setState(() {});
       await uploadImageToFirebase(pickedImage); // Upload the selected image
     }
   }
@@ -62,11 +61,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> sendMessage(String message) async {
-    setState(() {
-    });
+    setState(() {});
     User? currentUser = _auth.currentUser;
     CollectionReference usersCollection =
-        FirebaseFirestore.instance.collection('users');
+    FirebaseFirestore.instance.collection('users');
 
     await usersCollection.doc(currentUser!.uid).collection('messageschat').add({
       'text': message,
@@ -79,7 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     User? currentUser = _auth.currentUser;
     CollectionReference usersCollection =
-        FirebaseFirestore.instance.collection('users');
+    FirebaseFirestore.instance.collection('users');
     return Scaffold(
       extendBodyBehindAppBar: true,
       primary: false,
@@ -154,7 +152,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 return const Text("Loading...");
                               }
                               var userData =
-                                  snapshot.data!.data() as Map<String, dynamic>;
+                              snapshot.data!.data() as Map<String, dynamic>;
                               String name = userData['name'] ?? '';
                               return Column(
                                 children: [
@@ -173,7 +171,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       ),
                                       Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             name,
@@ -225,7 +223,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         flex: 3,
                         child: StreamBuilder<QuerySnapshot>(
                           stream: usersCollection
-                              .doc(currentUser.uid)
+                              .doc(currentUser!.uid)
                               .collection('messageschat')
                               .orderBy('timestamp')
                               .snapshots(),
@@ -241,12 +239,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               itemCount: messages.length,
                               itemBuilder: (context, index) {
                                 var messageData = messages[index].data()
-                                    as Map<String, dynamic>;
+                                as Map<String, dynamic>;
                                 var messageText = messageData['text'] ?? '';
                                 var imageUrl = messageData['imgUrl'] ?? '';
                                 var timestamp =
-                                    (messageData['timestamp'] as Timestamp)
-                                        .toDate();
+                                (messageData['timestamp'] as Timestamp?)
+                                    ?.toDate();
                                 var isCurrentUser =
                                     currentUser.uid == messageData['senderId'];
 
@@ -257,22 +255,23 @@ class _ChatScreenState extends State<ChatScreen> {
                                   children: [
                                     if (imageUrl.isNotEmpty)
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(10),
                                         child: Image.network(
                                           imageUrl,
                                           height: 300,
                                           width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
+                                              .size
+                                              .width *
                                               0.44,
                                           fit: BoxFit.cover,
                                         ),
                                       ), // Display image if exists
                                     Container(
+
                                       constraints: BoxConstraints(
                                         maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                                0.66,
+                                        MediaQuery.of(context).size.width *
+                                            0.66,
                                       ),
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
@@ -280,7 +279,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         color: isCurrentUser
                                             ? const Color(0xffF3F3F3)
                                             : const Color(0xff20B25D)
-                                                .withOpacity(0.1),
+                                            .withOpacity(0.1),
                                       ),
                                       child: Text(
                                         messageText,
@@ -294,8 +293,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                           : MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          DateFormat('h:mm a')
-                                              .format(timestamp),
+                                          timestamp != null
+                                              ? DateFormat('h:mm a')
+                                              .format(timestamp)
+                                              : '',
                                           style: GoogleFonts.poppins(
                                             fontSize: 12,
                                             color: Colors.grey,
@@ -315,51 +316,54 @@ class _ChatScreenState extends State<ChatScreen> {
                         height: 15,
                       ),
                       const Spacer(),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.82,
-                            child: TextFormField(
-                              controller: _message,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 14, horizontal: 14),
-                                hintText: "Your Message",
-                                suffixIcon: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.camera),
-                                      onPressed: _selectImage,
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.send),
-                                      onPressed: () {
-                                        if (_message.text.isNotEmpty) {
-                                          sendMessage(_message.text);
-                                          _message.clear();
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                hintStyle: GoogleFonts.poppins(),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xffE8E6EA),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            SizedBox(
+
+                              width: MediaQuery.of(context).size.width * 0.85,
+                              child: TextFormField(
+                                controller: _message,
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 10),
+                                  hintText: "Type Message",
+                                  suffixIcon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.image),
+                                        onPressed: _selectImage,
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.send),
+                                        onPressed: () {
+                                          if (_message.text.isNotEmpty) {
+                                            sendMessage(_message.text);
+                                            _message.clear();
+                                          }
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xffE8E6EA),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: const BorderSide(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: const BorderSide(
+                                      color: Colors.black54,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),

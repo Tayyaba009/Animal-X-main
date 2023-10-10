@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:janwar_x/constants/apppadding.dart';
 import 'package:janwar_x/views/Homescreen/items.dart';
+import 'package:janwar_x/views/Homescreen/product.dart';
 import 'package:janwar_x/widgets/app_text.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +22,27 @@ class _HomePageState extends State<HomePage> {
   List<QueryDocumentSnapshot> products = [];
   List<QueryDocumentSnapshot> filteredProducts = [];
 
-  List<Category> categories = []; // Define a list of categories.
+  List<Category> categories = [];
+  final List<Color> predefinedColors = [
+    Colors.blue,
+    Colors.indigo,
+    Color(0xFFF56AB4),
+    Color(0xFF053D52),
+    Colors.deepPurple,
+    Colors.red,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+    Colors.amber,
+    Colors.cyan,
+    Colors.pink,
+    Colors.lime,
+    Colors.lightBlue,
+    Colors.deepOrange,
+    Colors.brown,
+  ];
+// Define a list of categories.
 
   @override
   void initState() {
@@ -29,6 +50,18 @@ class _HomePageState extends State<HomePage> {
     fetchFavoriteItemIds();
     fetchProducts();
     fetchCategories(); // Call the method to fetch categories.
+  }
+  void filterProducts(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredProducts = [];
+      } else {
+        filteredProducts = products.where((product) {
+          final title = product['title'] ?? '';
+          return title.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      }
+    });
   }
 
   Future<void> fetchFavoriteItemIds() async {
@@ -48,16 +81,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchCategories() async {
-    final snapshot =
-    await FirebaseFirestore.instance.collection('categories').get();
+    final snapshot = await FirebaseFirestore.instance.collection('categories').get();
 
     List<Category> newCategories = [];
 
-    for (final doc in snapshot.docs) {
+    for (int i = 0; i < snapshot.docs.length; i++) {
+      final doc = snapshot.docs[i];
       final categoryId = doc.id;
       final categoryName = doc['name'];
       final imageUrl = doc['image_url'];
-      final categoryColor = _getRandomColor();
+
+      // Assign a predefined color based on the index
+      final categoryColor = predefinedColors[i % predefinedColors.length];
 
       newCategories.add(Category(
         id: categoryId,
@@ -73,97 +108,106 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void filterProducts(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredProducts = [];
-      } else {
-        filteredProducts = products.where((product) {
-          final title = product['title'] ?? '';
-          return title.toLowerCase().contains(query.toLowerCase());
-        }).toList();
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xFFFBEEDB),
+       // backgroundColor: Color(0xFFFBEEDB),
         body: ListView(
           children: [
             Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 55),
+                  padding: const EdgeInsets.only(bottom: 20),
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(),
                     child: Padding(
                       padding: AppPadding.defaultPadding,
-                      child: Column(
-                        children: [
-                          const SizedBox(
-                            height: 18,
-                          ),
-                          const Text(
-                            'Home',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'HELLO!',
+                                  style: TextStyle(
+                                    fontSize: 20,
+
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(width: 8), // Add spacing between "HELLO" and "Find your"
+                                Text(
+                                  'Find your',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.90,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                // Add border here
-                                color: Colors.orange,
+                            Text(
+                              'perfect pet companion here',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: TextFormField(
-                                controller: searchController,
-                                onChanged: (query) {
-                                  filterProducts(query);
-                                },
-                                decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 10,
-                                  ),
-                                  fillColor: Color(0xFFF6C08B),
-                                  filled: true,
-                                  hintText: 'Search',
-                                  hintStyle: TextStyle(
-                                    fontSize: 13,
-                                  ),
-                                  prefixIcon: const Padding(
-                                    padding: EdgeInsets.all(13.0),
-                                    child: Icon(Icons.search),
-                                  ),
-                                  focusedBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.transparent,
+
+                        const SizedBox(
+                              height: 12,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.90,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all( // Add border here
+                                  color: Colors.orange, // Choose your border color
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: TextFormField(
+                                  controller: searchController,
+                                  onChanged: (query) {
+                                    filterProducts(query);
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 10,
                                     ),
-                                  ),
-                                  enabledBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.transparent,
+                                    fillColor: Color(0xFFF6C08B),
+                                    filled: true,
+                                    hintText: 'Search',
+                                    hintStyle: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                    prefixIcon: const Padding(
+                                      padding: EdgeInsets.all(13.0),
+                                      child: Icon(Icons.search),
+                                    ),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                    enabledBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.transparent,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -223,8 +267,7 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.only(left: 12, right: 12),
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 5.0,
                     mainAxisSpacing: 10.0,
@@ -238,11 +281,21 @@ class _HomePageState extends State<HomePage> {
                         : products[index];
                     final title = product['title'] ?? '';
                     final price = product['price'] ?? '';
+                    final quantity = product['quantity'] ?? '';
+
                     final imageUrl = product['imageUrl'] ?? '';
                     final videoUrl = product['videoUrl'] ?? '';
+                    final String age = product['age'] ?? '';
+
+                    final String description = product['description'] ?? '';
+                    final String phone = product['phone'] ?? '';
+                    final String weight = product['weight'] ?? '';
 
                     final documentId = snapshot.data!.docs[index].id;
                     final isFavorite = favoriteItemIds.contains(documentId);
+
+                    final screenHeight = MediaQuery.of(context).size.height;
+                    final imageContainerHeight = screenHeight * 0.5;// Adjust the percentage as needed
 
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -252,13 +305,20 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(builder: (context) {
                               return ItemDetailsScreen(
-                                documentId: documentId,
+                                title: title,
+                                age: age,
+                                description: description,
+                                phone: phone,
+                                price: price,
+                                quantity: quantity,
                                 videoUrl: videoUrl,
+                                weight: weight,
+                                imageUrl: imageUrl,
                               );
                             }),
                           );
                         },
-                        child: Column(
+                        child:Stack(
                           children: [
                             CachedNetworkImage(
                               imageUrl: imageUrl,
@@ -268,93 +328,107 @@ class _HomePageState extends State<HomePage> {
                               errorWidget: (context, url, error) =>
                                   Icon(Icons.error),
                               imageBuilder: (context, imageProvider) =>
+
                                   Container(
-                                    height: 100,
+                                    height: imageContainerHeight, // Adjust the height as needed
                                     decoration: BoxDecoration(
                                       color: Colors.grey[200],
                                       image: DecorationImage(
                                         image: imageProvider,
                                         fit: BoxFit.cover,
                                       ),
-                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderRadius: BorderRadius.circular(14.0),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                          top: 0,
+                                          right: 0,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                if (isFavorite) {
+                                                  favoriteItemIds.remove(documentId);
+                                                  FirebaseFirestore.instance
+                                                      .collection('favorites')
+                                                      .doc(documentId)
+                                                      .delete();
+                                                } else {
+                                                  favoriteItemIds.add(documentId);
+                                                  FirebaseFirestore.instance
+                                                      .collection('favorites')
+                                                      .doc(documentId)
+                                                      .set({
+                                                    'title': title,
+                                                    'price': price,
+                                                    'imageUrl': imageUrl,
+                                                  });
+                                                }
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(8.0),
+                                              color: Colors.black.withOpacity(0.0),
+                                              child: Icon(
+                                                isFavorite
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color: isFavorite ? Colors.red : Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                             ),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.center,
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          title,
-                                          style: const TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.3),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(14.0),
+                                    bottomRight: Radius.circular(14.0),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("PKR $price"),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              if (isFavorite) {
-                                                favoriteItemIds
-                                                    .remove(documentId);
-                                                FirebaseFirestore.instance
-                                                    .collection('favorites')
-                                                    .doc(documentId)
-                                                    .delete();
-                                              } else {
-                                                favoriteItemIds
-                                                    .add(documentId);
-                                                FirebaseFirestore.instance
-                                                    .collection('favorites')
-                                                    .doc(documentId)
-                                                    .set({
-                                                  'title': title,
-                                                  'price': price,
-                                                  'imageUrl': imageUrl,
-                                                });
-                                              }
-                                            });
-                                          },
-                                          child: isFavorite
-                                              ? Icon(
-                                            Icons.favorite,
-                                            color: Colors.red,
-                                          )
-                                              : Icon(
-                                            Icons.favorite_border,
-                                          ),
-                                        ),
-                                      ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      title,
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      "PKR $price",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontSize: 12.0,
+
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
-                        ),
+                        )
+
+
                       ),
                     );
                   },
                 );
+
+
               },
             ),
           ],
@@ -367,34 +441,42 @@ class _HomePageState extends State<HomePage> {
     final containerSize = 110.0;
 
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal, // Allow horizontal scrolling.
+      scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
         children: categories.map((category) {
-          return InkWell(
+          return GestureDetector(
             onTap: () {
               // Navigate to the product list screen for the selected category.
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return ProductListScreen(categoryId: category.id);
+                  return ProductScreen();
                 }),
               );
             },
             child: Container(
-              margin: EdgeInsets.only(right: 15.0), // Add right margin for spacing.
+              margin: EdgeInsets.only(right: 15.0),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(containerSize / 2), // Make it half for a circle
+                borderRadius: BorderRadius.circular(containerSize / 2),
                 color: category.backgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 3), // Changes the position of the shadow
+                  ),
+                ],
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 20.0), // Add top padding
+                padding: const EdgeInsets.only(top: 20.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
                       width: containerSize * 0.7,
-                      height: containerSize * 0.7,
+                      height: containerSize * 0.5,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withOpacity(0.3),
@@ -402,7 +484,7 @@ class _HomePageState extends State<HomePage> {
                       child: ClipOval(
                         child: CachedNetworkImage(
                           imageUrl: category.imageUrl,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                           placeholder: (context, url) =>
                               CircularProgressIndicator(),
                           errorWidget: (context, url, error) =>
@@ -410,7 +492,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 8.0),
+                    SizedBox(height: 10.0),
                     Container(
                       margin: EdgeInsets.only(bottom: 20),
                       child: Text(
@@ -429,6 +511,11 @@ class _HomePageState extends State<HomePage> {
         }).toList(),
       ),
     );
+  }
+
+
+  void _showOptionsBottomSheet(String categoryId, String categoryName) {
+    // Implement your logic to show options for the selected category.
   }
 }
 
@@ -460,23 +547,4 @@ void main() {
   runApp(MaterialApp(
     home: HomePage(),
   ));
-}
-
-class ProductListScreen extends StatelessWidget {
-  final String categoryId;
-
-  ProductListScreen({required this.categoryId});
-
-  @override
-  Widget build(BuildContext context) {
-    // You can use the categoryId to filter and display products for the selected category.
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Products for Category $categoryId'),
-      ),
-      body: Center(
-        child: Text('Display products for category $categoryId here.'),
-      ),
-    );
-  }
 }

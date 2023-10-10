@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:janwar_x/widgets/app_text.dart';
 import 'package:video_player/video_player.dart';
+import 'package:janwar_x/widgets/app_text.dart';
+
+import 'chat.dart';
 
 class ItemDetailsScreen extends StatefulWidget {
-  final String documentId;
+  final String description;
+  final String imageUrl;
+  final String phone;
+  final String age;
+  final double price;
+  final int quantity;
+  final String title;
   final String videoUrl;
+  final String weight;
 
   ItemDetailsScreen({
-    required this.documentId,
+    required this.imageUrl,
+    required this.description,
+    required this.phone,
+    required this.price,
+    required this.quantity,
+    required this.title,
     required this.videoUrl,
+    required this.weight,
+    required this.age,
   });
 
   @override
@@ -18,20 +33,12 @@ class ItemDetailsScreen extends StatefulWidget {
 }
 
 class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
-  late Future<DocumentSnapshot> _itemSnapshot;
   late VideoPlayerController _videoController;
 
   @override
   void initState() {
     super.initState();
 
-    // Fetch item data from Firestore
-    _itemSnapshot = FirebaseFirestore.instance
-        .collection('addpro')
-        .doc(widget.documentId)
-        .get();
-
-    // Initialize video controller
     _videoController = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((_) {
         setState(() {});
@@ -41,194 +48,187 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Item Details'),
-      ),
+      backgroundColor: Color(0xFFFBEEDB), // Background color of the entire screen
+
+
       body: SingleChildScrollView(
-        child: FutureBuilder<DocumentSnapshot>(
-          future: _itemSnapshot,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+        child: Padding(
+          padding: EdgeInsets.only(top: 35,),
 
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return Center(child: Text('Item not found'));
-            }
-
-            final itemData = snapshot.data!.data() as Map<String, dynamic>;
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Product Image or Video
+            Stack(
               children: [
-                Stack(
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height * 1.5, // Adjust the height as needed
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                        ),
+                ClipRRect(
+                  // Rounded corners for the image
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.0),
+                    bottomRight: Radius.circular(20.0),
+                  ),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 1 / 2.7, // Adjusted height
+
+                      child  : CachedNetworkImage(
+                      imageUrl: widget.imageUrl,
+                      width: MediaQuery.of(context).size.width * 1, // Adjust the percentage as needed
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(
+                        child: CircularProgressIndicator(),
                       ),
-                      child: CachedNetworkImage(
-                        imageUrl: itemData['imageUrl'],
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                      ),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
-                    Positioned(
-                      top: 16.0,
-                      right: 16.0,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_videoController.value.isInitialized) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return VideoPlayerScreen(
-                                    videoController: _videoController,
-                                  );
-                                },
-                              ),
-                            );
-                          }
-                        },
-                        child: Text("View Video"),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText(
-                        text: itemData['name'],
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      SizedBox(height: 8.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          AppText(
-                            text: 'Price: RS ${itemData['price']}',
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16.0),
-                      AppText(
-                        text: 'Description:',
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      AppText(
-                        text: itemData['description'],
-                        fontSize: 16.0,
-                      ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: 100.0,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  AppText(
-                                    text: 'Age',
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  AppText(
-                                    text: itemData['age'],
-                                    fontSize: 16.0,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 16.0),
-                          Expanded(
-                            child: Container(
-                              height: 100.0,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  AppText(
-                                    text: 'Weight',
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  AppText(
-                                    text: itemData['weight'],
-                                    fontSize: 16.0,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 16.0),
-                          Expanded(
-                            child: Container(
-                              height: 100.0,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  AppText(
-                                    text: 'Quantity',
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  AppText(
-                                    text: itemData['quantity'].toString(),
-                                    fontSize: 16.0,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+
                   ),
                 ),
               ],
+            ),
+            // Age, Weight, and Quantity
+            Container(
+              width: MediaQuery.of(context).size.width, // Set the width to the screen width
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildAttributeCard("Age", widget.age),
+                    _buildAttributeCard("Weight", widget.weight),
+                    _buildAttributeCard("Quantity", widget.quantity.toString()),
+                  ],
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: AppText(
+                      text: widget.title,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold, // Unbold product name
+                    ),
+                  ),
+                  Spacer(), // Pushes the price to the right
+                  AppText(
+                    text: 'Price: RS ${widget.price}',
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.normal, // Unbold price
+                  ),
+                ],
+              ),
+            ),
+
+
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AppText(
+                    text: 'Description:',
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  AppText(
+                    text: widget.description,
+                    fontSize: 14.0,
+                  ),
+                ],
+              ),
+            ),
+            // Buy Button
+            SizedBox(height: 60,),// Row containing Buy and View Video buttons
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+    child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround, // Adjust alignment as needed
+    children: [
+    // Buy Button
+      ElevatedButton(
+        onPressed: () {
+          // Navigate to the VideoPlayerScreen
+          if (_videoController.value.isInitialized) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return VideoPlayerScreen(
+                    videoController: _videoController,
+                  );
+                },
+              ),
             );
-          },
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          primary: Color(0xFF021D33), // Set the button color to green
+        ),
+        child: Text(
+          "View Video",
+          style: TextStyle(color: Colors.white), // Set the text color to white
+        ),
+      ),
+    SizedBox(
+    width: 120,
+    child:ElevatedButton(
+      onPressed: () {
+        // Navigate to the ChatScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(), // Create an instance of your ChatScreen
+          ),
+        );
+      },
+    style: ElevatedButton.styleFrom(
+
+    primary: Colors.lightGreen, // Set the button color to blue
+    ),
+    child: Text(
+    "Buy",
+    style: TextStyle(color: Colors.white), // Set the text color to white
+    ),
+    ),
+    // View Video Button
+    ),
+    ],
+    ),
+    ),
+],
+    ),
+      ),
+      ),
+    );
+  }
+
+  Widget _buildAttributeCard(String title, String value) {
+    return SizedBox(
+      width: 100.0, // Adjust the width as needed
+      height:  80.0, // Adjust the height as needed
+      child: Card(
+        elevation: 4.0,
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              AppText(
+                text: title,
+                fontSize: 12.0, // Decreased font size for attribute title
+                fontWeight: FontWeight.bold,
+              ),
+              SizedBox(height: 8.0),
+              AppText(
+                text: value,
+                fontSize: 10.0, // Decreased font size for attribute value
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -277,9 +277,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           }
         },
         child: Icon(
-          widget.videoController.value.isPlaying
-              ? Icons.pause
-              : Icons.play_arrow,
+          widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow,
         ),
       ),
     );

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: ProductListScreen(),
+    home: ProductScreen(),
   ));
 }
 
-class ProductListScreen extends StatelessWidget {
+class ProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Product List'),
+        title: Text('Product Grid View'),
       ),
       body: ProductGridView(),
     );
@@ -21,18 +22,41 @@ class ProductListScreen extends StatelessWidget {
 class ProductGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: EdgeInsets.all(16.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-      ),
-      itemCount: productData.length,
-      itemBuilder: (context, index) {
-        final product = productData[index];
-        return ProductCard(
-          product: product,
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('addprod').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        final products = snapshot.data!.docs;
+
+        return GridView.builder(
+          padding: EdgeInsets.all(16.0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
+          ),
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+            final name = product['name'] ?? '';
+            final price = product['price'] ?? '';
+            final category = product['category'] ?? '';
+
+            return ProductCard(
+              imageAsset: 'assets/product_image.png', // Replace with your image path.
+              name: name,
+              price: '\$$price',
+              category: category,
+              isFirst: index.isEven, // Adjust alignment for even and odd indices.
+            );
+          },
         );
       },
     );
@@ -40,30 +64,39 @@ class ProductGridView extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  final Product product;
+  final String imageAsset;
+  final String name;
+  final String price;
+  final String category;
+  final bool isFirst;
 
-  ProductCard({required this.product});
+  ProductCard({
+    required this.imageAsset,
+    required this.name,
+    required this.price,
+    required this.category,
+    required this.isFirst,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
         color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
+            spreadRadius: 1,
             blurRadius: 5,
             offset: Offset(0, 2),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
           Container(
-            width: double.infinity,
             height: 150.0,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
@@ -71,87 +104,45 @@ class ProductCard extends StatelessWidget {
                 topRight: Radius.circular(10.0),
               ),
               image: DecorationImage(
-                image: AssetImage(product.image),
+                image: AssetImage(imageAsset),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
                 Text(
-                  product.name,
+                  name,
                   style: TextStyle(
-                    fontSize: 16.0,
                     fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
                   ),
                 ),
                 Text(
-                  '\$${product.price}',
+                  price,
                   style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
                     color: Colors.green,
+                  ),
+                ),
+                Text(
+                  category,
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.grey,
                   ),
                 ),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              product.category,
-              style: TextStyle(
-                fontSize: 14.0,
-                color: Colors.grey,
-              ),
-            ),
-          ),
         ],
       ),
+      margin: isFirst
+          ? EdgeInsets.only(top: 0.0) // Adjust the top margin for the first item.
+          : EdgeInsets.only(top: 20.0),
     );
   }
 }
-
-class Product {
-  final String name;
-  final double price;
-  final String category;
-  final String image;
-
-  Product({
-    required this.name,
-    required this.price,
-    required this.category,
-    required this.image,
-  });
-}
-
-final List<Product> productData = [
-  Product(
-    name: 'Pet 1',
-    price: 29.99,
-    category: 'Category 1',
-    image: 'assets/pet1.jpg',
-  ),
-  Product(
-    name: 'Pet 2',
-    price: 39.99,
-    category: 'Category 2',
-    image: 'assets/pet2.jpg',
-  ),
-  Product(
-    name: 'Pet 3',
-    price: 19.99,
-    category: 'Category 1',
-    image: 'assets/pet3.jpg',
-  ),
-  Product(
-    name: 'Pet 4',
-    price: 49.99,
-    category: 'Category 2',
-    image: 'assets/pet4.jpg',
-  ),
-];

@@ -5,7 +5,7 @@ import 'package:janwar_x/constants/apppadding.dart';
 import 'package:janwar_x/views/sell/add_prod.dart';
 import 'package:janwar_x/widgets/app_text.dart';
 import '../Homescreen/video_player.dart';
-import 'product_detail.dart'; // Import the product detail page
+import 'product_detail.dart';
 
 class SellPage extends StatefulWidget {
   const SellPage({Key? key}) : super(key: key);
@@ -18,24 +18,20 @@ class _SellPageState extends State<SellPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFBEEDB), // Background color of the entire screen
       body: Column(
         children: [
-          Container(
-            height: 70,
-            width: double.infinity,
-            decoration: const BoxDecoration(color: Colors.black),
-          ),
           const SizedBox(
             height: 15,
           ),
           const Padding(
-            padding: AppPadding.defaultPadding,
+            padding: const EdgeInsets.only(top: 25, left: 18  ),
             child: Row(
               children: [
                 AppText(
                   text: "Your Items",
                   fontSize: 20,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w700
                 ),
               ],
             ),
@@ -72,156 +68,114 @@ class _SellPageState extends State<SellPage> {
                     final imageUrl = product['imageUrl'] ?? '';
                     final videoUrl = product['videoUrl'] ?? '';
 
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return ProductDetailPage(
-                                productSnapshot: product,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 25, left: 22, right: 22),
-                        child: Container(
-                          height: 230,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  CachedNetworkImage(
-                                    imageUrl: imageUrl,
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 18, right: 18),
+                      child: Container(
+                        height: 190,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFE8E6EA),
+                          borderRadius: BorderRadius.circular(17),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            // Left side (image) with left padding
+                            Padding(
+                              padding: EdgeInsets.only(left: 12.0),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.5,
+                                height: 160,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  image: DecorationImage(
+                                    image: NetworkImage(imageUrl),
                                     fit: BoxFit.cover,
-                                    placeholder: (context, url) => const CircularProgressIndicator(),
-                                    errorWidget: (context, url, error) => const Icon(Icons.error),
-                                    imageBuilder: (context, imageProvider) => Container(
-                                      width: MediaQuery.of(context).size.width * 0.425,
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.cover,
-                                        ),
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(15),
-                                          topRight: Radius.circular(15),
-                                        ),
-                                      ),
-                                    ),
                                   ),
-                                  const Spacer(),
-                                  Stack(
-                                    alignment: AlignmentDirectional.center,
-                                    children: [
-                                      CachedNetworkImage(
-                                        imageUrl: imageUrl,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) => const CircularProgressIndicator(),
-                                        errorWidget: (context, url, error) => const Icon(Icons.error),
-                                        imageBuilder: (context, imageProvider) => Container(
-                                          width: MediaQuery.of(context).size.width * 0.425,
-                                          height: 150,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            image: DecorationImage(
-                                              image: imageProvider,
-                                              fit: BoxFit.cover,
-                                            ),
-                                            borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(15),
-                                              topRight: Radius.circular(15),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context, MaterialPageRoute(
-                                            builder: (context) {
-                                              return VideoPlayerView(
-                                                videoUrl: videoUrl,
-                                              );
-                                            },
-                                          ));
-                                        },
-                                        child: const Center(
-                                          child: Icon(
-                                            Icons.play_circle_fill,
-                                            size: 50,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    bottomLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16),
+                                    bottomRight: Radius.circular(16),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 11,
-                              ),
-                              Padding(
-                                padding: AppPadding.defaultPadding,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const AppText(
-                                          text: "Name:",
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                        AppText(
-                                          text: title,
-                                          color: Colors.white,
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const AppText(
-                                          text: "Price:",
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                        AppText(
-                                          text: "PKR $price",
-                                          color: Colors.white,
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const AppText(
-                                          text: "Quantity:",
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                        AppText(
-                                          text: "$quantity",
-                                          color: Colors.white,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            // Right side (text)
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 12.0, top: 30, bottom: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Name
+                                    Text(
+                                      title,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    // Price
+                                    Text(
+                                      'Price: PKR $price',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    //
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Quantity: $quantity',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    // Edit and Delete Icons
+                                    const SizedBox(height: 30),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            _editProduct(product);
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(left: 16.0),
+                                                child: Icon(Icons.edit),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            _deleteProduct(product);
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.delete, color: Colors.red),
+                                              const SizedBox(width: 30), // Reduce the spacing here
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    )
+
+                                  ],
+
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -243,6 +197,68 @@ class _SellPageState extends State<SellPage> {
           Icons.add,
           color: Colors.white,
         ),
+      ),
+    );
+  }
+
+  void _editProduct(DocumentSnapshot product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return AddProd();
+        },
+      ),
+    );
+  }
+
+  void _deleteProduct(DocumentSnapshot product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete this product?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Implement delete logic here to remove the product from Firestore
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('addprod')
+                      .doc(product.id) // Use the document ID to identify the product
+                      .delete();
+
+                  Navigator.of(context).pop(); // Close the dialog
+                  // You can also refresh the product list if needed
+                } catch (e) {
+                  print('Error deleting product: $e');
+                  // Handle the error here, e.g., show an error message
+                }
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _viewProductDetails(DocumentSnapshot product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return ProductDetailPage(
+            productSnapshot: product,
+          );
+        },
       ),
     );
   }

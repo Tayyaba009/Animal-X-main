@@ -17,8 +17,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
         topLeft: Radius.circular(22),
         topRight: Radius.circular(22),
       ),
-      child: Container(
-        height: 80, // Adjust the height of the navigation bar
+      child: Container(// Adjust the height of the navigation bar
         child: Stack(
           children: [
             Positioned(
@@ -50,7 +49,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                       Icon(
                         EvaIcons.homeOutline,
                         color: currentIndex == 0
-                            ? Colors.white
+                            ? Colors.black
                             : Colors.white,
                       ),
                       const SizedBox(height: 4),
@@ -58,7 +57,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                         'Home',
                         style: TextStyle(
                           color: currentIndex == 0
-                              ? Colors.white
+                              ? Colors.black
                               : Colors.white,
                         ),
                       ),
@@ -74,7 +73,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                       Icon(
                         EvaIcons.shoppingBagOutline,
                         color: currentIndex == 1
-                            ? Colors.white
+                            ? Colors.black
                             : Colors.white,
                       ),
                       const SizedBox(height: 4),
@@ -82,7 +81,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                         'Sell',
                         style: TextStyle(
                           color: currentIndex == 1
-                              ? Colors.white
+                              ? Colors.black
                               : Colors.white,
                         ),
                       ),
@@ -97,7 +96,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                       Icon(
                         EvaIcons.heartOutline,
                         color: currentIndex == 2
-                            ? Colors.white
+                            ? Colors.black
                             : Colors.white,
                       ),
                       const SizedBox(height: 4),
@@ -105,7 +104,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                         'Favorites',
                         style: TextStyle(
                           color: currentIndex == 2
-                              ? Colors.white
+                              ? Colors.black
                               : Colors.white,
                         ),
                       ),
@@ -120,7 +119,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                       Icon(
                         EvaIcons.personOutline,
                         color: currentIndex == 3
-                            ? Colors.white
+                            ? Colors.black
                             : Colors.white,
                       ),
                       const SizedBox(height: 4),
@@ -128,7 +127,7 @@ class AppBottomSheetBusiness extends StatelessWidget {
                         'Profile',
                         style: TextStyle(
                           color: currentIndex == 3
-                              ? Colors.white
+                              ? Colors.black
                               : Colors.white,
                         ),
                       ),
