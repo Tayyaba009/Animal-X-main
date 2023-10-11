@@ -63,6 +63,7 @@ class _AddProdState extends State<AddProd> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Product'),

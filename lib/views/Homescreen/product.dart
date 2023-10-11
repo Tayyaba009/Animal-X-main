@@ -1,148 +1,87 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: ProductScreen(),
-  ));
-}
+class ProductListScreen extends StatelessWidget {
+  final String categoryName;
 
-class ProductScreen extends StatelessWidget {
+  ProductListScreen({required this.categoryName});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Product Grid View'),
+        title: Text('Products in $categoryName'),
       ),
-      body: ProductGridView(),
-    );
-  }
-}
-
-class ProductGridView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('addprod').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        }
-
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-
-        final products = snapshot.data!.docs;
-
-        return GridView.builder(
-          padding: EdgeInsets.all(16.0),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-          ),
-          itemCount: products.length,
-          itemBuilder: (context, index) {
-            final product = products[index];
-            final name = product['name'] ?? '';
-            final price = product['price'] ?? '';
-            final category = product['category'] ?? '';
-
-            return ProductCard(
-              imageAsset: 'assets/product_image.png', // Replace with your image path.
-              name: name,
-              price: '\$$price',
-              category: category,
-              isFirst: index.isEven, // Adjust alignment for even and odd indices.
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('categories')
+            .where('name', isEqualTo: categoryName)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
             );
-          },
-        );
-      },
-    );
-  }
-}
+          }
 
-class ProductCard extends StatelessWidget {
-  final String imageAsset;
-  final String name;
-  final String price;
-  final String category;
-  final bool isFirst;
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-  ProductCard({
-    required this.imageAsset,
-    required this.name,
-    required this.price,
-    required this.category,
-    required this.isFirst,
-  });
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text('No products found in this category.'),
+            );
+          }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
+          // Fetch the reference to the 'products' subcollection
+          final categoryDoc = snapshot.data!.docs.first;
+          final categoryRef = categoryDoc.reference;
+          final productsRef = categoryRef.collection('products');
+
+          return StreamBuilder<QuerySnapshot>(
+            stream: productsRef.snapshots(),
+            builder: (context, productsSnapshot) {
+              if (productsSnapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${productsSnapshot.error}'),
+                );
+              }
+
+              if (productsSnapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              final products = productsSnapshot.data!.docs;
+
+              if (products.isEmpty) {
+                return Center(
+                  child: Text('No products found in this category.'),
+                );
+              }
+
+              return ListView.builder(
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  final productName = product['title'] ?? '';
+                  final productPrice = product['price'] ?? 0.0;
+
+                  return ListTile(
+                    title: Text(productName),
+                    subtitle: Text('Price: \$${productPrice.toStringAsFixed(2)}'),
+                    // You can add more details about the product here.
+                  );
+                },
+              );
+            },
+          );
+        },
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Container(
-            height: 150.0,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10.0),
-                topRight: Radius.circular(10.0),
-              ),
-              image: DecorationImage(
-                image: AssetImage(imageAsset),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0,
-                  ),
-                ),
-                Text(
-                  price,
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.green,
-                  ),
-                ),
-                Text(
-                  category,
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      margin: isFirst
-          ? EdgeInsets.only(top: 0.0) // Adjust the top margin for the first item.
-          : EdgeInsets.only(top: 20.0),
     );
   }
 }

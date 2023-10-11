@@ -107,12 +107,11 @@ class _HomePageState extends State<HomePage> {
       categories.addAll(newCategories);
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-       // backgroundColor: Color(0xFFFBEEDB),
+       backgroundColor: Color(0xFFFBEEDB),
         body: ListView(
           children: [
             Stack(
@@ -451,7 +450,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return ProductScreen();
+                  return ProductListScreen(categoryName: '',);
                 }),
               );
             },
